@@ -39,7 +39,7 @@ CURRENT_PATH='%F{cyan}%~%f'
 DEFAULT_PROMPT='%F{normal}%#%f'
 
 setopt PROMPT_SUBST
-export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '\n" >> $TERMINAL_FILE
     
     printSuccess "$TERMINAL_STYLE - configurado"
 else
@@ -47,3 +47,6 @@ else
 fi
 
 printSuccess "VSetup executado com sucesso!"
+
+# Apply style configuration
+exec zsh
