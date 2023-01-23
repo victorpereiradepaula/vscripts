@@ -14,14 +14,69 @@ function printWarning {
 }
 
 function createFileIfNeeded {
-    if [ ! -f  "$1" ];then
+    if [ ! -f  "$1" ]; then
         printWarning "$1 não encontrado"
-        printf "Criando $1 ...\n"
-        sudo touch $1 >/dev/null 2>&1 || { printError >&2 "Falha ao criar o arquivo $1."; exit 1; }
+        echo "Criando $1 ..."
+        touch $1 >/dev/null 2>&1 || { printError >&2 "Falha ao criar o arquivo $1."; exit 1; }
     fi
 }
 
+# USER_OPTION=false
+function askToUser {
+    echo "$1 [s/n]"
+    USER_OPTION=false
+    read readedUserOption
+    for positiveOption in "Y" "Yes" "y" "yes" "S" "Sim" "s" "sim"; do
+        if [ $positiveOption = $readedUserOption ]; then
+            USER_OPTION=true
+            break
+        fi
+    done
+}
+
+# Homebrew
+function installHomebrew {
+    printWarning "Homebrew não instalado."
+    askToUser "Deseja instalar o Homebrew?"
+    if [ $USER_OPTION ]; then
+        echo "Instalando Homebrew..."
+        command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+}
+
+function checkHomebrew {
+    command -v brew >/dev/null 2>&1 || { installHomebrew; }
+}
+
+echo "Verificando Homebrew..."
+checkHomebrew
+
+# Git
+function installGit {
+    askToUser "Deseja instalar o Git?"
+    if [ $USER_OPTION ]; then
+        echo "Instalando git..."
+        command brew install git
+    fi
+}
+
+function checkGit {
+    command -v git 2>&1 >/dev/null || { checkHomebrew; installGit; }
+}
+
+echo "Verificando git..."
+checkGit
+
+# Git config
+echo "Configurando git config..."
+
+command git config --global push.autoSetupRemote true
+
+printSuccess "Git config configurado"
+
 # Terminal style
+echo "Configurando terminal style..."
+
 TERMINAL_FILE=~/".zshrc"
 createFileIfNeeded $TERMINAL_FILE
 
