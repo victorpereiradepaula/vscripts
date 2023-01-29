@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [ ! $SHELL = '/bin/zsh' ]; then
+    command chsh -s /bin/zsh
+fi
+
 # Utils
 function printError {
 	printf "\033[0;31m$1\033[0m\n"
@@ -84,7 +88,9 @@ TERMINAL_STYLE="# VScripts - terminal style"
 VALUE=`grep -c "$TERMINAL_STYLE" $TERMINAL_FILE`
 
 if [ $VALUE = 0 ]; then
-    echo -e "\n$TERMINAL_STYLE
+    if [ -w TERMINAL_FILE ]; then
+        echo "" >> $TERMINAL_FILE
+        echo "$TERMINAL_STYLE
 function git_branch() {
         git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
 }
@@ -94,8 +100,12 @@ CURRENT_PATH='%F{cyan}%~%f'
 DEFAULT_PROMPT='%F{normal}%#%f'
 
 setopt PROMPT_SUBST
-export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '\n" >> $TERMINAL_FILE
-    
+export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+        echo "" >> $TERMINAL_FILE
+    else
+        printError "Sem acesso de escrita para adicionar configuração de estilo."
+        exit 0
+    fi
     printSuccess "$TERMINAL_STYLE - configurado"
 else
     printWarning "$TERMINAL_STYLE - já configurado"

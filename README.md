@@ -2,9 +2,15 @@
 
 ## VSetup
 
+Configurações iniciais para ambiante de desenvolvimento em MacOS.
+
 **O que o script de setup faz?**
 
-- [x] Adição de estilo personalizado ao terminal `zsh`, com cores e nome da branch atual.
+- [x] Mudança de `bash` para `zsh`
+- [x] Instalação do [Homebrew](https://brew.sh)
+- [x] Instalação do [Git](https://git-scm.com/download/mac)
+- [X] Configuração do `.gitconfig`
+- [x] Adição de estilo ao terminal `zsh`, com cores e nome da branch atual.
 
 ### Utilização
 Para utilizar, digite o seguinte comando no terminal:
