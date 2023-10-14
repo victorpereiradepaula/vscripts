@@ -49,10 +49,10 @@ function installHomebrew {
 }
 
 function checkHomebrew {
+    echo "Verificando Homebrew..."
     command -v brew >/dev/null 2>&1 || { installHomebrew; }
 }
 
-echo "Verificando Homebrew..."
 checkHomebrew
 
 # Git
@@ -65,18 +65,30 @@ function installGit {
 }
 
 function checkGit {
+    echo "Verificando git..."
     command -v git 2>&1 >/dev/null || { checkHomebrew; installGit; }
 }
 
-echo "Verificando git..."
 checkGit
 
-# Git config
-echo "Configurando git config..."
+# Git global configuration
+echo "iniciando configurações globais do git..."
 
-command git config --global push.autoSetupRemote true
+read -a fullName -p "Digite seu nome: "
+git config --global user.name "${fullName[*]}"
 
-printSuccess "Git config configurado"
+
+read -p "Digite seu email: " email
+git config --global user.email $email
+
+
+git config --global pull.rebase false
+git config --global push.autoSetupRemote true
+git config --global fetch.prune true
+
+git config --global alias.branchclean 'git fetch -p ; git branch -r | awk "{print $1}" | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk "{print $1}" | xargs git branch -d'
+
+printSuccess "Git global - configurado"
 
 # Terminal style
 echo "Configurando terminal style..."
@@ -90,6 +102,7 @@ VALUE=`grep -c "$TERMINAL_STYLE" $TERMINAL_FILE`
 if [ $VALUE = 0 ]; then
     if [ -w TERMINAL_FILE ]; then
         echo "" >> $TERMINAL_FILE
+        echo "" >> $TERMINAL_FILE
         echo "$TERMINAL_STYLE
 function git_branch() {
         git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
@@ -101,6 +114,7 @@ DEFAULT_PROMPT='%F{normal}%#%f'
 
 setopt PROMPT_SUBST
 export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+        echo "" >> $TERMINAL_FILE
         echo "" >> $TERMINAL_FILE
     else
         printError "Sem acesso de escrita para adicionar configuração de estilo."
