@@ -86,7 +86,7 @@ git config --global pull.rebase false
 git config --global push.autoSetupRemote true
 git config --global fetch.prune true
 
-git config --global alias.branchclean 'git fetch -p ; git branch -r | awk "{print $1}" | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk "{print $1}" | xargs git branch -d'
+git config --global alias.cleanbranches "!f() { git branch --merged | grep -v \"main\\|master\\|develop\\|*\" | xargs git branch -D; }; f"
 
 printSuccess "Git global - configurado"
 
