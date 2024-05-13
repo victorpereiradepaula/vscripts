@@ -47,6 +47,8 @@ function installHomebrew {
     if $USER_OPTION; then
         echo "Instalando Homebrew..."
         command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
 }
 
@@ -118,12 +120,12 @@ function git_branch() {
         git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
 }
 
-USER='%F{normal}%n%f'
+CURRENT_USER_PATH='%F{normal}%n%f'
 CURRENT_PATH='%F{cyan}%~%f'
 DEFAULT_PROMPT='%F{normal}%#%f'
 
 setopt PROMPT_SUBST
-export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+export PROMPT='\${CURRENT_USER_PATH} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
                 echo "" >> $TERMINAL_FILE
                 echo "" >> $TERMINAL_FILE
             else
