@@ -1,5 +1,7 @@
 #! /bin/bash
 
+USER_OPTION=false
+
 if [ ! $SHELL = '/bin/zsh' ]; then
     command chsh -s /bin/zsh
 fi
@@ -42,7 +44,7 @@ function askToUser {
 function installHomebrew {
     printWarning "Homebrew não instalado."
     askToUser "Deseja instalar o Homebrew?"
-    if [ $USER_OPTION ]; then
+    if $USER_OPTION; then
         echo "Instalando Homebrew..."
         command /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
@@ -58,7 +60,7 @@ checkHomebrew
 # Git
 function installGit {
     askToUser "Deseja instalar o Git?"
-    if [ $USER_OPTION ]; then
+    if $USER_OPTION; then
         echo "Instalando git..."
         command brew install git
     fi
@@ -72,58 +74,70 @@ function checkGit {
 checkGit
 
 # Git global configuration
-echo "iniciando configurações globais do git..."
+function configGit {
+    askToUser "Deseja configurar o git?"
+    if $USER_OPTION; then
+        echo "iniciando configurações globais do git..."
 
-read -a fullName -p "Digite seu nome: "
-git config --global user.name "${fullName[*]}"
+        read -a fullName -p "Digite seu nome: "
+        git config --global user.name "${fullName[*]}"
 
+        read -p "Digite seu email: " email
+        git config --global user.email $email
 
-read -p "Digite seu email: " email
-git config --global user.email $email
+        git config --global pull.rebase false
+        git config --global push.autoSetupRemote true
+        git config --global fetch.prune true
 
+        git config --global alias.cleanbranches "!f() { git branch --merged | grep -v \"main\\|master\\|develop\\|*\" | xargs git branch -D; }; f"
 
-git config --global pull.rebase false
-git config --global push.autoSetupRemote true
-git config --global fetch.prune true
-
-git config --global alias.cleanbranches "!f() { git branch --merged | grep -v \"main\\|master\\|develop\\|*\" | xargs git branch -D; }; f"
-
-printSuccess "Git global - configurado"
-
-# Terminal style
-echo "Configurando terminal style..."
-
-TERMINAL_FILE=~/".zshrc"
-createFileIfNeeded $TERMINAL_FILE
-
-TERMINAL_STYLE="# VScripts - terminal style"
-VALUE=`grep -c "$TERMINAL_STYLE" $TERMINAL_FILE`
-
-if [ $VALUE = 0 ]; then
-    if [ -w TERMINAL_FILE ]; then
-        echo "" >> $TERMINAL_FILE
-        echo "" >> $TERMINAL_FILE
-        echo "$TERMINAL_STYLE
-function git_branch() {
-        git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
+        printSuccess "Git global - configurado"
+    fi
 }
 
-USER='%F{normal}%n%f'
-CURRENT_PATH='%F{cyan}%~%f'
-DEFAULT_PROMPT='%F{normal}%#%f'
+configGit
 
-setopt PROMPT_SUBST
-export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
-        echo "" >> $TERMINAL_FILE
-        echo "" >> $TERMINAL_FILE
-    else
-        printError "Sem acesso de escrita para adicionar configuração de estilo."
-        exit 0
+# Terminal style
+function configTerminalStyle {
+    askToUser "Deseja configurar o estilo do terminal?"
+    if $USER_OPTION; then
+        echo "Configurando terminal style..."
+
+        TERMINAL_FILE=~/".zshrc"
+        createFileIfNeeded $TERMINAL_FILE
+
+        TERMINAL_STYLE="# VScripts - terminal style"
+        VALUE=`grep -c "$TERMINAL_STYLE" $TERMINAL_FILE`
+
+        if [ $VALUE = 0 ]; then
+            if [ -w $TERMINAL_FILE ]; then
+                echo "" >> $TERMINAL_FILE
+                echo "" >> $TERMINAL_FILE
+                echo "$TERMINAL_STYLE
+        function git_branch() {
+                git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
+        }
+
+        USER='%F{normal}%n%f'
+        CURRENT_PATH='%F{cyan}%~%f'
+        DEFAULT_PROMPT='%F{normal}%#%f'
+
+        setopt PROMPT_SUBST
+        export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+                echo "" >> $TERMINAL_FILE
+                echo "" >> $TERMINAL_FILE
+            else
+                printError "Sem acesso de escrita para adicionar configuração de estilo."
+                exit 0
+            fi
+            printSuccess "$TERMINAL_STYLE - configurado"
+        else
+            printWarning "$TERMINAL_STYLE - já configurado"
+        fi
     fi
-    printSuccess "$TERMINAL_STYLE - configurado"
-else
-    printWarning "$TERMINAL_STYLE - já configurado"
-fi
+}
+
+configTerminalStyle
 
 printSuccess "VSetup executado com sucesso!"
 
