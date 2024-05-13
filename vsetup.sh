@@ -114,16 +114,16 @@ function configTerminalStyle {
                 echo "" >> $TERMINAL_FILE
                 echo "" >> $TERMINAL_FILE
                 echo "$TERMINAL_STYLE
-        function git_branch() {
-                git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
-        }
+function git_branch() {
+        git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1] /p'
+}
 
-        USER='%F{normal}%n%f'
-        CURRENT_PATH='%F{cyan}%~%f'
-        DEFAULT_PROMPT='%F{normal}%#%f'
+USER='%F{normal}%n%f'
+CURRENT_PATH='%F{cyan}%~%f'
+DEFAULT_PROMPT='%F{normal}%#%f'
 
-        setopt PROMPT_SUBST
-        export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
+setopt PROMPT_SUBST
+export PROMPT='\${USER} \${CURRENT_PATH} %F{green}\$(git_branch)\${DEFAULT_PROMPT} '" >> $TERMINAL_FILE
                 echo "" >> $TERMINAL_FILE
                 echo "" >> $TERMINAL_FILE
             else
